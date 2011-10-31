@@ -1,21 +1,21 @@
 from django.db import models
 from taggit_autocomplete_modified.managers import TaggableManagerAutocomplete as TaggableManager
-from imagekit.models import ImageModel
-import undefcms.imagespecs
+from filebrowser.fields import FileBrowseField
+import mimetypes
+from undefcms.types import filetypes
+import commands
+import fields
+from django.conf import settings
+import re
 
-class Image(ImageModel):
-    title = models.CharField(max_length=100)
-    original_image = models.ImageField(upload_to='images')
+#CATEGORY
+class Category(models.Model):
+    name = models.CharField(max_length = 512)
+    slug = models.SlugField(max_length = 128)
+    description = models.TextField(blank=True)
     
-    num_views = models.PositiveIntegerField(editable=False, default=0)
-    
-    class IKOptions:
-        # This inner class is where we define the ImageKit options for the model
-        spec_module = 'undefcms.imagespecs'
-        cache_dir = 'thumbs'
-        image_field = 'original_image'
-        save_count_as = 'nunm_views'
-        admin_thumbnail_spec = 'thumbnail_image'
+    def __unicode__(self):
+        return self.name
 
 #MAIN MODEL
 class Post(models.Model):
@@ -25,17 +25,70 @@ class Post(models.Model):
     creation = models.DateTimeField(blank=True)
     last_edit = models.DateTimeField(blank=True, auto_now_add=True)
     visible = models.BooleanField()
-    content = models.TextField()
+    content = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    
+    #category
+    category = models.ManyToManyField(Category)
+    
+    #image
+    preview = FileBrowseField("Preview", max_length=200, directory="images/", extensions=[".jpg",".jpeg", ".gif", ".png"], blank=True, null=True)
     
     #header stuff
     header = models.TextField(blank=True)
     javascript = models.TextField(blank=True)
     css = models.TextField(blank=True)
     
-    #image
-    preview = models.ForeignKey(Image, related_name="+", blank=True, null=True)
+    def __unicode__(self):
+        return self.title
     
-    images = models.ManyToManyField(Image, blank=True)
+    class Meta:
+        ordering = ('-creation',)
+    
+class File(models.Model):
+    name = models.CharField(max_length = 512, blank=True)
+    description = models.TextField(blank = True)
+    file = FileBrowseField("File", max_length=200, directory="", blank=True, null=True)
+    post = models.ForeignKey(Post)
+    index = models.PositiveIntegerField()
+    type = models.CharField(max_length = 128, blank = True, null = True, editable = False)
+    extra = fields.JSONField(null=True, blank=True, editable = False)
+    
+    def save(self):
+        mime = mimetypes.guess_type(self.file.path)[0]
+        if self.extra is None:
+            self.extra = {}
+        self.extra["mime"] = mime
+        if mime == "image/jpeg" or mime == "image/png" or mime == "image/gif":
+            self.type = filetypes["image"]
+        elif mime == "video/mp4":
+            self.type = filetypes["video"]
+            if self.extra.has_key("lastFile") is False or self.extra["lastFile"] != self.file.filename or settings.DEBUG:
+                res = commands.getoutput("ffmpeg -i "+self.file.path)
+                dimFind = re.findall(r'(\d+x\d+)', res)
+                dim = dimFind[0].split("x")
+                width = dim[0]
+                height = dim[1]
+                self.extra["width"] = width
+                self.extra["height"] = height
+                '''
+                #time to encode
+                videoPath = settings.MEDIA_ROOT+"encodedVideos/"
+                comOGG = "ffmpeg -i "+self.file.path+" -acodec libvorbis -ac 2 -ab 96k -ar 44100 -b 345k -s "+dimFind[0]+" "+videoPath+self.file.filename+".ogv"
+                res = commands.getoutput(comOGG)
+                self.extra["encodeMsg"] = res
+                '''
+                
+        else:
+            self.type = mime
+        self.extra["lastFile"] = self.file.filename
+        super(File, self).save()
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ('index',)
     
     
     
