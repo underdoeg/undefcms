@@ -34,7 +34,7 @@ class Content(models.Model):
     description = models.TextField(blank=True)
     
     #category
-    category = models.ManyToManyField(Category)
+    category = models.ManyToManyField(Category, blank=True, null=True)
     
     #image
     preview = FileBrowseField("Preview", max_length=200, directory="images/", extensions=[".jpg",".jpeg", ".gif", ".png"], blank=True, null=True)
@@ -59,7 +59,7 @@ class Post(Content):
 
 class Page(Content):
     parent = models.ForeignKey("self", blank=True, null=True)
-    index = models.PositiveIntegerField()
+    index = models.PositiveIntegerField(default = 0)
     
     def __unicode__(self):
         return self.title
