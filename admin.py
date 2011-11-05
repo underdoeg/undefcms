@@ -48,8 +48,8 @@ class ContentAdmin(AjaxSelectAdmin):
         
     class Media:
         js = [
-            '/static/grappelli/tinymce/jscripts/tiny_mce/tiny_mce.js',
-            '/static/js/tinymce_setup.js',
+            settings.STATIC_URL+'grappelli/tinymce/jscripts/tiny_mce/tiny_mce.js',
+            settings.STATIC_URL+'js/tinymce_setup.js',
         ]
     
     the_preview.allow_tags = True
