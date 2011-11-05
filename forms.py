@@ -14,11 +14,9 @@ class ContentForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(ContentForm, self).__init__(*args, **kwargs)
-        self.fields['javascript'].widget = CodeMirrorTextarea(parserfile=['parsejavascript.js', 'tokenizejavascript.js'], stylesheet=[r'codemirror/css/jscolors.css'])
-        self.fields['header'].widget = CodeMirrorTextarea(parserfile=['parsexml.js'], stylesheet=[r'codemirror/css/xmlcolors.css'])
-        self.fields['css'].widget = CodeMirrorTextarea(parserfile=['parsecss.js'], stylesheet=[r'codemirror/css/csscolors.css'])
-        self.fields['content'].widget = CodeMirrorTextarea(parserfile=['parsecss.js', 'parsejavascript.js', 'tokenizejavascript.js', 'parsexml.js', 'parsehtmlmixed.js'],
-                                                           stylesheet=[r'codemirror/css/csscolors.css', r'codemirror/css/xmlcolors.css', r'codemirror/css/jscolors.css'])
-        self.fields['description'].widget = CodeMirrorTextarea(parserfile=['parsecss.js', 'parsejavascript.js', 'tokenizejavascript.js', 'parsexml.js', 'parsehtmlmixed.js'],
-                                                           stylesheet=[r'codemirror/css/csscolors.css', r'codemirror/css/xmlcolors.css', r'codemirror/css/jscolors.css'])
+        self.fields['javascript'].widget = CodeMirrorTextarea(parserfile=['parsejavascript.js', 'tokenizejavascript.js'], stylesheet=[r'js/codemirror/css/jscolors.css'], path="js/codemirror")
+        self.fields['header'].widget = CodeMirrorTextarea(parserfile=['parsexml.js'], stylesheet=[r'js/codemirror/css/xmlcolors.css'], path="js/codemirror")
+        self.fields['css'].widget = CodeMirrorTextarea(parserfile=['parsecss.js'], stylesheet=[r'js/codemirror/css/csscolors.css'], path="js/codemirror")
+        #self.fields['content'].widget = CodeMirrorTextarea(parserfile=['parsecss.js', 'parsejavascript.js', 'tokenizejavascript.js', 'parsexml.js', 'parsehtmlmixed.js'], stylesheet=[r'codemirror/css/csscolors.css', r'codemirror/css/xmlcolors.css', r'codemirror/css/jscolors.css'])
+        #self.fields['description'].widget = CodeMirrorTextarea(parserfile=['parsecss.js', 'parsejavascript.js', 'tokenizejavascript.js', 'parsexml.js', 'parsehtmlmixed.js], stylesheet=[r'codemirror/css/csscolors.css', r'codemirror/css/xmlcolors.css', r'codemirror/css/jscolors.css'])
         

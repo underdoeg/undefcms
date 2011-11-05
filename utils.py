@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 def getCategories(slug = "", id = -1):
-    ret =  Category.objects.all()
+    ret =  Category.objects.filter(parent__isnull=True)
     for c in ret:
         if id != -1 and c.id == active:
             c.active = True

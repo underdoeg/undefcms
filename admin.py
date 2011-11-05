@@ -46,6 +46,12 @@ class ContentAdmin(AjaxSelectAdmin):
         else:
             return '<img src="/thumb/60/60/hh" />'
         
+    class Media:
+        js = [
+            '/static/grappelli/tinymce/jscripts/tiny_mce/tiny_mce.js',
+            '/static/js/tinymce_setup.js',
+        ]
+    
     the_preview.allow_tags = True
     the_preview.short_description = "Preview"
 

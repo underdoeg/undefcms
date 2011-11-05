@@ -30,6 +30,7 @@ class Content(models.Model):
     creation = models.DateTimeField(blank=True)
     last_edit = models.DateTimeField(blank=True, auto_now_add=True)
     visible = models.BooleanField()
+    #content = tinymce_models.HTMLField(blank=True)
     content = models.TextField(blank=True)
     description = models.TextField(blank=True)
     
