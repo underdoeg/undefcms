@@ -13,12 +13,17 @@ class Category(models.Model):
     name = models.CharField(max_length = 512)
     slug = models.SlugField(max_length = 128)
     description = models.TextField(blank=True)
+    parent = models.ForeignKey("self", blank=True, null=True)
     
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        verbose_name_plural = "Categories"
 
-#MAIN MODEL
-class Post(models.Model):
+
+#DEFINITIONS FOR COMMON PAGE AND POST FIELDS
+class Content(models.Model):
     title = models.CharField(max_length = 512)
     slug = models.SlugField(max_length = 128)
     tags = TaggableManager(blank=True)
@@ -39,17 +44,35 @@ class Post(models.Model):
     javascript = models.TextField(blank=True)
     css = models.TextField(blank=True)
     
+    class Meta:
+        abstract = True
+
+    
+#POST AND PAGE MODELS
+class Post(Content):
+    
     def __unicode__(self):
         return self.title
     
     class Meta:
         ordering = ('-creation',)
+
+class Page(Content):
+    parent = models.ForeignKey("self", blank=True, null=True)
+    index = models.PositiveIntegerField()
     
+    def __unicode__(self):
+        return self.title
+    
+    class Meta:
+        ordering = ("index", )
+
+
+#FILE
 class File(models.Model):
     name = models.CharField(max_length = 512, blank=True)
     description = models.TextField(blank = True)
     file = FileBrowseField("File", max_length=200, directory="", blank=True, null=True)
-    post = models.ForeignKey(Post)
     index = models.PositiveIntegerField()
     type = models.CharField(max_length = 128, blank = True, null = True, editable = False)
     extra = fields.JSONField(null=True, blank=True, editable = False)
@@ -89,6 +112,12 @@ class File(models.Model):
     
     class Meta:
         ordering = ('index',)
+        abstract = True
     
+class PageFile(File):
+    page = models.ForeignKey(Page)
+
+class PostFile(File):
+    post = models.ForeignKey(Post)
     
     

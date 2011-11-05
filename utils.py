@@ -38,7 +38,17 @@ def getPostIdBySlug(slug):
     
 def getPost(postId):
     return Post.objects.get(id=postId)
+
+##pages stuff
+def getPages():
+    return Page.objects.all().filter(visible = True)
+
+def getPageIdBySlug(slug):
+    return get_object_or_404(Page, slug__iexact=slug).id
     
+def getPage(postId):
+    return Page.objects.get(id=postId)
+
 ##image stuff
 try:
     from PIL import Image, ImageOps
