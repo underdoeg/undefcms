@@ -3,7 +3,7 @@ from django.contrib import admin
 from django import forms
 from django.db import models
 from forms import ContentForm
-from ajax_select.admin import AjaxSelectAdmin
+#from ajax_select.admin import AjaxSelectAdmin
 from datetime import datetime
 from django.conf import settings
 
@@ -11,7 +11,7 @@ from django.conf import settings
 class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
-class ContentAdmin(AjaxSelectAdmin):
+class ContentAdmin(admin.ModelAdmin):
     form = ContentForm
     list_display = ('the_preview', 'title', 'the_categories', 'the_tags', 'creation', 'visible')
     list_filter = ('category', 'creation', 'last_edit', 'visible')
