@@ -47,7 +47,6 @@ class Content(models.Model):
     
     class Meta:
         abstract = True
-
     
 #POST AND PAGE MODELS
 class Post(Content):
@@ -57,6 +56,9 @@ class Post(Content):
     
     class Meta:
         ordering = ('-creation',)
+        
+    def getFiles(self):
+        return self.postfile_set.all()
 
 class Page(Content):
     parent = models.ForeignKey("self", blank=True, null=True)
@@ -67,6 +69,9 @@ class Page(Content):
     
     class Meta:
         ordering = ("index", )
+        
+    def getFiles(self):
+        return self.pagefile_set.all()
 
 
 #FILE
