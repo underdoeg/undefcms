@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from ajax_select.fields import AutoCompleteSelectMultipleField, AutoCompleteSelectField
+#from ajax_select.fields import AutoCompleteSelectMultipleField, AutoCompleteSelectField
 from codemirror.widgets import CodeMirrorTextarea
 
 
