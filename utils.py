@@ -1,6 +1,7 @@
 from models import *
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+import os.path
 
 def getCategoriesRecursiveHelper(parent, activeId):
     if parent == None:
@@ -87,11 +88,15 @@ except ImportError:
     import ImageOps
 
 def getThumbWidth(path, height):
-    image = Image.open(settings.MEDIA_ROOT+path)
+    if not os.path.isfile(path):
+        return 0
+    image = Image.open(path)
     ratio = float(height)/float(image.size[1])
     return int(ratio*int(image.size[0]))
     
 def getThumbHeight(path, width):
-    image = Image.open(settings.MEDIA_ROOT+path)
+    if not os.path.isfile(path):
+        return 0
+    image = Image.open(path)
     ratio = float(width)/float(image.size[0])
     return int(ratio*int(image.size[1]))

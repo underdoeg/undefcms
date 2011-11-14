@@ -7,7 +7,12 @@ from forms import ContentForm
 from datetime import datetime
 from django.conf import settings
 
-    
+# import the logging library
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
 
@@ -20,6 +25,15 @@ class ContentAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     #fields = ('title', 'slug')
     
+    fieldsets = (
+        (None, {
+            'fields': (('title', 'slug'), ('preview', 'visible'), 'category', 'creation', 'content', 'description'),
+        }),
+        ('header', {
+            'classes': ('collapse closed',),
+            'fields' : ('header','javascript','css',),
+        }),
+    )
     
     def save_model(self, request, obj, form, change):
         if obj.creation == None:
@@ -71,6 +85,21 @@ class FilePageInline(admin.TabularInline):
     ordering = ['index']
 
 class PageAdmin(ContentAdmin):
+    '''
+    def __init__(self, model, admin_site):
+        ContentAdmin.fieldsets[0][1]["fields"] = ContentAdmin.fieldsets[0][1]["fields"][0:3]+ ("parent",) + ContentAdmin.fieldsets[0][1]["fields"][3:]
+        ContentAdmin.__init__(self, model, admin_site)    
+        logger.error(str(self.fieldsets[0][1]["fields"]))
+    '''
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'slug', 'preview', 'parent', 'category', 'creation', 'visible', 'content', 'description'),
+        }),
+        ('header', {
+            'classes': ('collapse closed',),
+            'fields' : ('header','javascript','css',),
+        }),
+    )
     inlines = (FilePageInline, )
 
 admin.site.register(Category, CategoryAdmin)
