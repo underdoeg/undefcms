@@ -26,8 +26,13 @@ class ContentAdmin(admin.ModelAdmin):
     #fields = ('title', 'slug')
     
     fieldsets = (
-        (None, {
-            'fields': (('title', 'slug'), ('preview', 'visible'), 'category', 'creation', 'content', 'description'),
+        ('title & infos',{
+            #'classes': ('collapse open',),
+            'fields': (('title', 'slug','visible'), ('preview', 'creation'), ('category', 'tags'))
+        }),
+        ('content', {
+            #'classes': ('collapse open',),
+            'fields':  ('content', 'description'),
         }),
         ('header', {
             'classes': ('collapse closed',),
@@ -74,6 +79,7 @@ class FilePostInline(admin.TabularInline):
     sortable_field_name = 'index'
     extra = 0
     ordering = ['index']
+    classes = ('collapse open',)
 
 class PostAdmin(ContentAdmin):
     inlines = (FilePostInline, )
@@ -83,6 +89,7 @@ class FilePageInline(admin.TabularInline):
     sortable_field_name = 'index'
     extra = 0
     ordering = ['index']
+    classes = ('collapse open',)
 
 class PageAdmin(ContentAdmin):
     '''
@@ -92,8 +99,13 @@ class PageAdmin(ContentAdmin):
         logger.error(str(self.fieldsets[0][1]["fields"]))
     '''
     fieldsets = (
-        (None, {
-            'fields': ('title', 'slug', 'preview', 'parent', 'category', 'creation', 'visible', 'content', 'description'),
+        ('title & infos',{
+            #'classes': ('collapse open',),
+            'fields': (('title', 'slug','visible'), ('preview', 'creation'), ('parent', 'category', 'tags'))
+        }),
+        ('content', {
+            #'classes': ('collapse open',),
+            'fields':  ('content', 'description'),
         }),
         ('header', {
             'classes': ('collapse closed',),
