@@ -87,11 +87,11 @@ except ImportError:
     import ImageOps
 
 def getThumbWidth(path, height):
-    image = Image.open(path)
+    image = Image.open(settings.MEDIA_ROOT+path)
     ratio = float(height)/float(image.size[1])
     return int(ratio*int(image.size[0]))
     
 def getThumbHeight(path, width):
-    image = Image.open(path)
+    image = Image.open(settings.MEDIA_ROOT+path)
     ratio = float(width)/float(image.size[0])
     return int(ratio*int(image.size[1]))
