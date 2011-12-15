@@ -61,7 +61,7 @@ class ContentAdmin(admin.ModelAdmin):
         
     def the_preview(self, obj):
         if obj.preview and obj.preview.filetype == "Image":
-           return  '<img src="/thumb/60/60/uploads/images/'+str(obj.preview)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
+           return  '<img src="/thumb/60/60/'+str(obj.preview.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
         else:
             return '<img src="/thumb/60/60/hh" />'
         

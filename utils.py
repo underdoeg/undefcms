@@ -88,7 +88,7 @@ except ImportError:
     import ImageOps
 
 def getThumbWidth(path, height):
-    path = settings.MEDIA_ROOT+path
+    path = str(path)
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)
@@ -96,7 +96,7 @@ def getThumbWidth(path, height):
     return int(ratio*int(image.size[0]))
     
 def getThumbHeight(path, width):
-    path = settings.MEDIA_ROOT+path
+    path = str(path)
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)

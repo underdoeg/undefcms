@@ -20,6 +20,7 @@ class Category(models.Model):
     
     class Meta:
         verbose_name_plural = "Categories"
+        ordering = ("name",)
 
 
 #DEFINITIONS FOR COMMON PAGE AND POST FIELDS
@@ -83,7 +84,7 @@ class File(models.Model):
     type = models.CharField(max_length = 128, blank = True, null = True, editable = False)
     extra = fields.JSONField(null=True, blank=True, editable = False)
     
-    def save(self):
+    def save(self, *args, **kwargs):
         mime = mimetypes.guess_type(self.file.path)[0]
         if self.extra is None:
             self.extra = {}
@@ -111,7 +112,7 @@ class File(models.Model):
         else:
             self.type = mime
         self.extra["lastFile"] = self.file.filename
-        super(File, self).save()
+        super(File, self).save(*args, **kwargs)
     
     def __unicode__(self):
         return self.name
