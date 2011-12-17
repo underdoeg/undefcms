@@ -50,7 +50,15 @@ def getPosts(showHidden = False, excludeCategories = []):
     return ret
 
 def getPostsByCategory(catId):
-    return getPosts().filter(category=catId)
+    ret = getPosts()
+    if isinstance(catId, int):
+        return ret.filter(category=catId)
+    else:
+        if len(catId) is 0:
+            return getPosts()
+        for c in catId:
+            ret = ret.filter(category=c)
+        return ret
     
 def getPostsByCategorySlug(slug):
     return getPostsByCategory(getCategoryIdBySlug(slug))
