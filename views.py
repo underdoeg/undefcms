@@ -16,7 +16,8 @@ def thumb(request, w=-1, h=-1, path=""):
     if path == "":
         path = settings.STATIC_ROOT+"img/image_not_found.jpg"
     else:
-        path = settings.MEDIA_ROOT+path
+        if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
+            path = settings.MEDIA_ROOT+path
     
     if os.path.exists(path) == False:
         path = settings.STATIC_ROOT+"img/image_not_found.jpg"

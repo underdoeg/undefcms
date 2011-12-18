@@ -6,6 +6,7 @@ from forms import ContentForm
 #from ajax_select.admin import AjaxSelectAdmin
 from datetime import datetime
 from django.conf import settings
+from types import filetypes
 
 # import the logging library
 import logging
@@ -60,8 +61,8 @@ class ContentAdmin(admin.ModelAdmin):
         return ret
         
     def the_preview(self, obj):
-        if obj.preview and obj.preview.filetype == "Image":
-           return  '<img src="/thumb/60/60/'+str(obj.preview.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
+        if obj.preview:
+            return  '<img src="/thumb/60/60/'+str(obj.preview.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
         else:
             return '<img src="/thumb/60/60/hh" />'
         
@@ -114,8 +115,21 @@ class PageAdmin(ContentAdmin):
     )
     inlines = (FilePageInline, )
 
+class FileAdmin(admin.ModelAdmin):
+    list_display = ('the_preview', 'name', 'type')
+    list_filter = ('type',)
+    
+    def the_preview(self, obj):
+        if obj.type == filetypes["image"]:
+           return  '<img src="/thumb/60/60/'+str(obj.file.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
+        else:
+            return '<img src="/thumb/60/60/hh" />'
+    
+    the_preview.allow_tags = True
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Post, PostAdmin)
-admin.site.register(PageFile)
-admin.site.register(PostFile)
+admin.site.register(PageFile, FileAdmin)
+admin.site.register(PostFile, FileAdmin)
 admin.site.register(Page, PageAdmin)

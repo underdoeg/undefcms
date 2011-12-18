@@ -44,7 +44,7 @@ def wpimport(request, url, user, password):
         pass
     
     #get all the posts
-    posts = wp.call(GetRecentPosts(3000))
+    posts = wp.call(GetRecentPosts(1))
     c["posts"] = posts
     for p in posts:
         if not hasattr(p, 'slug'):
@@ -55,7 +55,7 @@ def wpimport(request, url, user, password):
         post.visible = True
         post.title = p.title
         p.description = p.description.replace('\n','<br />')
-        post.content = p.description
+        
         
         #extract the images
         soup = bs(p.description)
@@ -72,13 +72,14 @@ def wpimport(request, url, user, password):
             else:
                 urlretrieve(urlparse.urlunparse(parsed), outpath)
             
+            image.extract()
             
             #add image to post
             fileObj = FileObject(uploadDirRel+filename)
 
             file, created = PostFile.objects.get_or_create(file = fileObj, post=post, index=curImg)
             #file = PostFile.objects.create(file = fileObj, post=post, index=curImg)
-            #file.save()
+            file.save()
                 
             #check if the image is the preview image
             if curImg is 0:
@@ -86,7 +87,8 @@ def wpimport(request, url, user, password):
             
             curImg+=1
         
-       
+        post.content = str(soup)
+        
         #add the categories
         if not hasattr(p, 'categories'):
             p.categories = []
