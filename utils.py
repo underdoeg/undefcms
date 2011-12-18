@@ -85,6 +85,8 @@ def getPageIdBySlug(slug):
     return get_object_or_404(Page, slug__iexact=slug).id
     
 def getPage(postId):
+    if isinstance(postId, basestring):
+        return Page.objects.get(id=getPageIdBySlug(postId))
     return Page.objects.get(id=postId)
 
 def getPageBySlug(slug):
