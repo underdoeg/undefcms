@@ -27,6 +27,13 @@ def thumb(request, w=-1, h=-1, path=""):
     
     #load the image and resize
     image = Image.open(path)
+    
+    if int(w) > image.size[0]:
+        w = image.size[0]
+    
+    if int(h) > image.size[1]:
+        h = image.size[1] 
+    
     if h == -1:
         ratio = float(w)/float(image.size[0])
         h = int(ratio*int(image.size[1]))
