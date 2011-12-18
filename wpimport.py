@@ -44,7 +44,7 @@ def wpimport(request, url, user, password):
         pass
     
     #get all the posts
-    posts = wp.call(GetRecentPosts(1))
+    posts = wp.call(GetRecentPosts(3000))
     c["posts"] = posts
     for p in posts:
         if not hasattr(p, 'slug'):

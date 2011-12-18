@@ -14,6 +14,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length = 128)
     description = models.TextField(blank=True)
     parent = models.ForeignKey("self", blank=True, null=True)
+    visible = models.BooleanField(default=True)
     
     def __unicode__(self):
         return self.name

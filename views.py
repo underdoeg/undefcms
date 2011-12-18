@@ -2,6 +2,7 @@
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
+from django.shortcuts import redirect
 
 import os
 
@@ -34,7 +35,9 @@ def thumb(request, w=-1, h=-1, path=""):
         w = int(ratio*int(image.size[0]))
 
     if int(w) == image.size[0] and int(h) == image.size[1]:
-        return HttpResponse(open(path), mimetype="image/png")
+        path = path.replace(settings.MEDIA_ROOT, settings.MEDIA_URL, 1)
+        path = path.replace(settings.STATIC_ROOT, settings.STATIC_URL, 1)
+        return redirect(path)
     
     basename, extension = os.path.splitext(os.path.basename(path))
     filename = thumbPath+basename+"_"+str(w)+"x"+str(h)+".png"
@@ -42,6 +45,9 @@ def thumb(request, w=-1, h=-1, path=""):
     if os.path.exists(filename) == False:
         imagefit = ImageOps.fit(image, (int(w), int(h)), Image.ANTIALIAS)
         imagefit.save(filename, 'PNG', quality=80)
+    else:
+        return redirect(settings.MEDIA_URL+"thumbs/"+basename+"_"+str(w)+"x"+str(h)+".png")
+
     data = open(filename, "rb").read()
     return HttpResponse(data, mimetype="image/png")
     '''

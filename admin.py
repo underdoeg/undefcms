@@ -15,6 +15,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'parent', 'visible')
+    list_filter = ('visible', 'parent')
+    search_fields = ('name','description')
     prepopulated_fields = {"slug": ("name",)}
 
 class ContentAdmin(admin.ModelAdmin):

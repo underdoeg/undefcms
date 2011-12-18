@@ -5,9 +5,9 @@ import os.path
 
 def getCategoriesRecursiveHelper(parent, activeId):
     if parent == None:
-        set = Category.objects.filter(parent__isnull=True)
+        set = Category.objects.filter(parent__isnull=True, visible=True)
     else:
-        set = Category.objects.filter(parent=parent.id)
+        set = Category.objects.filter(parent=parent.id, visible=True)
     
     for c in set:
         c.parent = parent;
