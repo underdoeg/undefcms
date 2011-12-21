@@ -1,6 +1,7 @@
 from models import *
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.db.models import Q
 import os.path
 
 def getCategoriesRecursiveHelper(parent, activeId):
@@ -70,6 +71,12 @@ def getPost(postId):
     if isinstance(postId, basestring):
         return Post.objects.get(id=getPostIdBySlug(postId))
     return Post.objects.get(id=postId)
+
+def searchPosts(query):
+    return getPosts().filter(
+        Q(title__icontains = query) |
+        Q(content__icontains = query),
+    )
 
 ##pages stuff
 def getPages():
