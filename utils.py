@@ -52,7 +52,7 @@ def getPosts(showHidden = False, excludeCategories = []):
 
 def getPostsByCategory(catId):
     ret = getPosts()
-    if isinstance(catId, int):
+    if isinstance(catId, int) or isinstance(catId, long):
         return ret.filter(category=catId)
     else:
         if len(catId) is 0:
