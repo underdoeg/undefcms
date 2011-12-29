@@ -111,6 +111,8 @@ def getThumbWidth(path, height):
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)
+    if image.size[1] < height:
+        height = image.size[1]
     ratio = float(height)/float(image.size[1])
     return int(ratio*int(image.size[0]))
     
@@ -119,5 +121,8 @@ def getThumbHeight(path, width):
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)
+    return 0
+    if image.size[0] < width:
+        width = image.size[0]
     ratio = float(width)/float(image.size[0])
     return int(ratio*int(image.size[1]))
