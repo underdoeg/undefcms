@@ -106,6 +106,14 @@ except ImportError:
     import Image
     import ImageOps
 
+def getImageHeight(path):
+    image = Image.open(path)
+    return image.size[1]
+    
+def getImageWidth(path):
+    image = Image.open(path)
+    return image.size[0]
+    
 def getThumbWidth(path, height):
     path = str(path)
     if not os.path.isfile(path):
