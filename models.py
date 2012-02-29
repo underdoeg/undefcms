@@ -97,11 +97,12 @@ class File(models.Model):
             if self.extra.has_key("lastFile") is False or self.extra["lastFile"] != self.file.filename or settings.DEBUG:
                 res = commands.getoutput("ffmpeg -i "+self.file.path)
                 dimFind = re.findall(r'(\d+x\d+)', res)
-                dim = dimFind[0].split("x")
-                width = dim[0]
-                height = dim[1]
-                self.extra["width"] = width
-                self.extra["height"] = height
+                if len(dimFind) is not 0:
+                    dim = dimFind[0].split("x")
+                    width = dim[0]
+                    height = dim[1]
+                    self.extra["width"] = width
+                    self.extra["height"] = height
                 '''
                 #time to encode
                 videoPath = settings.MEDIA_ROOT+"encodedVideos/"
