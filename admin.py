@@ -25,6 +25,7 @@ class ContentAdmin(admin.ModelAdmin):
     list_display = ('the_preview', 'title', 'the_categories', 'the_tags', 'creation', 'visible')
     list_filter = ('category', 'creation', 'last_edit', 'visible')
     search_fields = ('title','content', 'tags', 'category')
+    list_display_links = ('the_preview', 'title')
     
     prepopulated_fields = {"slug": ("title",)}
     #fields = ('title', 'slug')
@@ -105,7 +106,7 @@ class PageAdmin(ContentAdmin):
     fieldsets = (
         ('title & infos',{
             #'classes': ('collapse open',),
-            'fields': (('title', 'slug','visible'), ('preview', 'creation'), ('parent', 'category', 'tags'))
+            'fields': (('title', 'slug','visible'), ('preview', 'creation', 'index'), ('parent', 'category', 'tags'))
         }),
         ('content', {
             #'classes': ('collapse open',),
@@ -116,7 +117,22 @@ class PageAdmin(ContentAdmin):
             'fields' : ('header','javascript','css',),
         }),
     )
+    sortable_field_name = 'index'
+    ordering = ['index']
     inlines = (FilePageInline, )
+
+    
+    list_display = ('the_preview', 'title', 'the_categories', 'the_tags', 'creation', 'visible', 'index')
+    list_display_links = ('the_preview', 'title',)
+    
+    list_editable = ('index',)  # 'position' is the name of the model field which holds the position of an element
+    
+    class Media:
+        js = (
+            #'js/admin_list_reorder.js',
+        )
+    
+    
 
 class FileAdmin(admin.ModelAdmin):
     list_display = ('the_preview', 'name', 'type')
