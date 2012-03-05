@@ -110,7 +110,8 @@ class File(models.Model):
                 res = commands.getoutput(comOGG)
                 self.extra["encodeMsg"] = res
                 '''
-                
+        elif mime == 'audio/mpeg':
+            self.type = filetypes["audio"]
         else:
             self.type = mime
         self.extra["lastFile"] = self.file.filename
