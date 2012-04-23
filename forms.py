@@ -4,6 +4,13 @@ from django.contrib import admin
 #from codemirror.widgets import CodeMirrorTextarea
 
 
+class FileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(FileForm, self).__init__(*args, **kwargs)
+        # key should be your sortable-field - in your exaple it's *index*
+        self.fields['index'].widget = forms.HiddenInput()
+
+
 class ContentForm(forms.ModelForm):
     
     '''

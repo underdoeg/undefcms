@@ -1,8 +1,9 @@
 from undefcms.models import *
 from django.contrib import admin
+from django.contrib.admin.options import InlineModelAdmin
 from django import forms
 from django.db import models
-from forms import ContentForm
+from forms import ContentForm, FileForm
 #from ajax_select.admin import AjaxSelectAdmin
 from datetime import datetime
 from django.conf import settings
@@ -36,7 +37,7 @@ class ContentAdmin(admin.ModelAdmin):
             'fields': (('title', 'slug','visible'), ('preview', 'creation'), ('category', 'tags'))
         }),
         ('content', {
-            #'classes': ('collapse open',),
+            'classes': ('collapse closed',),
             'fields':  ('content', 'description'),
         }),
         ('header', {
@@ -66,7 +67,7 @@ class ContentAdmin(admin.ModelAdmin):
         
     def the_preview(self, obj):
         if obj.preview:
-            return  '<img src="/thumb/60/60/'+str(obj.preview.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
+            return  '<img src="/thumb/60/60/'+str(obj.preview.path)+'" />'
         else:
             return '<img src="/thumb/60/60/hh" />'
         
@@ -79,22 +80,25 @@ class ContentAdmin(admin.ModelAdmin):
     the_preview.allow_tags = True
     the_preview.short_description = "Preview"
 
-class FilePostInline(admin.TabularInline):
-    model = PostFile
+
+class StackedFileInline(InlineModelAdmin):
+    template = 'admin/edit_inline/tabular.html'
+    
     sortable_field_name = 'index'
     extra = 0
     ordering = ['index']
     classes = ('collapse open',)
+    form = FileForm
+    fields = ('name','description', 'file', 'type', 'index')
+    
+class FilePostInline(StackedFileInline):
+    model = PostFile   
 
 class PostAdmin(ContentAdmin):
     inlines = (FilePostInline, )
 
-class FilePageInline(admin.TabularInline):
+class FilePageInline(StackedFileInline):
     model = PageFile
-    sortable_field_name = 'index'
-    extra = 0
-    ordering = ['index']
-    classes = ('collapse open',)
 
 class PageAdmin(ContentAdmin):
     '''
@@ -109,7 +113,7 @@ class PageAdmin(ContentAdmin):
             'fields': (('title', 'slug','visible'), ('preview', 'creation', 'index'), ('parent', 'category', 'tags'))
         }),
         ('content', {
-            #'classes': ('collapse open',),
+            'classes': ('collapse closed',),
             'fields':  ('content', 'description'),
         }),
         ('header', {
@@ -137,6 +141,9 @@ class PageAdmin(ContentAdmin):
 class FileAdmin(admin.ModelAdmin):
     list_display = ('the_preview', 'name', 'type')
     list_filter = ('type',)
+    
+    form = FileForm
+
     
     def the_preview(self, obj):
         if obj.type == filetypes["image"]:
