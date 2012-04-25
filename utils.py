@@ -99,6 +99,9 @@ def getPage(postId):
 def getPageBySlug(slug):
     return getPage(getPageIdBySlug(slug))
 
+def getPagesByParentSlug(slug):
+    return getPages().filter(parent__slug=slug)
+
 ##image stuff
 try:
     from PIL import Image, ImageOps
