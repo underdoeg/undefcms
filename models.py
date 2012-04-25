@@ -31,7 +31,7 @@ class Content(models.Model):
     tags = TaggableManager(blank=True)
     creation = models.DateTimeField(blank=True)
     last_edit = models.DateTimeField(blank=True, auto_now_add=True)
-    visible = models.BooleanField()
+    visible = models.BooleanField(default=True)
     #content = tinymce_models.HTMLField(blank=True)
     content = models.TextField(blank=True)
     description = models.TextField(blank=True)
