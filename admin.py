@@ -67,9 +67,9 @@ class ContentAdmin(admin.ModelAdmin):
         
     def the_preview(self, obj):
         if obj.preview:
-            return  '<img src="/thumb/60/60/'+str(obj.preview.path)+'" />'
+            return  '<img src="/cms/thumb/60/60/'+str(obj.preview.path)+'" />'
         else:
-            return '<img src="/thumb/60/60/hh" />'
+            return '<img src="/cms/thumb/60/60/hh" />'
         
     class Media:
         js = [
@@ -147,9 +147,9 @@ class FileAdmin(admin.ModelAdmin):
     
     def the_preview(self, obj):
         if obj.type == filetypes["image"]:
-           return  '<img src="/thumb/60/60/'+str(obj.file.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
+           return  '<img src="/cms/thumb/60/60/'+str(obj.file.path_relative)+'" />'#'<img src="%s" />' % obj.preview.version_generate("admin_thumbnail").url
         else:
-            return '<img src="/thumb/60/60/hh" />'
+            return '<img src="/cms/thumb/60/60/hh" />'
     
     the_preview.allow_tags = True
 

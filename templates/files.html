@@ -1,0 +1,17 @@
+{% load undef_tags %}
+
+<div id="files">
+    {% for file in files %}
+        <h2>{{file.name}}</h2>
+        {% if file.type == "img" %}
+            <img src="/cms/thumb/500/{{file.file.path}}" /><br/>
+        {% endif %}
+        {% if file.type == "video" %}
+            <p>VIDEO IS NOT YET IMPLEMENTED</p><br/>
+        {% endif %}
+        {% if file.type == "audio" %}
+            <p>AUDIO IS NOT YET IMPLEMENTED</p><br/>
+        {% endif %}
+        {{file.description}}
+    {% endfor %}
+</div>

@@ -72,6 +72,9 @@ def getPost(postId):
         return Post.objects.get(id=getPostIdBySlug(postId))
     return Post.objects.get(id=postId)
 
+def getPostBySlug(slug):
+    return getPost(getPostIdBySlug(slug))
+
 def searchPosts(query):
     return getPosts().filter(
         Q(title__icontains = query) |

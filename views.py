@@ -1,8 +1,68 @@
 # Create your views here.
+from django.template import RequestContext, loader, Context
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
+
+from models import *
+from utils import *
+
+templatePath = ""
+'''
+if hasattr(settings, 'CMS_TEMPLATE_PATH'):
+    templatePath = settings.CMS_TEMPLATE_PATH
+'''
+
+def posts(request, category=None):
+    t = loader.get_template(templatePath+'posts.html')
+    c = {}
+    if category is None:
+        c["posts"] = getPosts()
+    else:
+        c["posts"] = getPostsByCategorySlug(category)
+
+    c["pages"] = getPages()
+    c["categories"] = getCategories()
+    c["activeCategory"] = category;
+    c["area"] = "posts"
+    return HttpResponse(t.render(RequestContext(request, c)))
+    
+def post(request, slug):
+    t = loader.get_template(templatePath+'post.html')
+    c = {}
+    c["post"] = getPostBySlug(slug)
+    c["pages"] = getPages()
+    c["categories"] = getCategories()
+    c["area"] = "posts"
+    
+    filesTemplate = loader.get_template(templatePath+"files.html")
+    c["files"] = filesTemplate.render(RequestContext(request, {'files':c['post'].postfile_set.all()}))
+    
+    return HttpResponse(t.render(RequestContext(request, c)))
+    
+def pages(request, category=None):
+    t = loader.get_template(templatePath+'pages.html')
+    c = {}
+    c["pages"] = getPages()
+    c["categories"] = getCategories()
+    c["area"] = "pages"
+    return HttpResponse(t.render(RequestContext(request, c)))
+
+def page(request, slug):
+    t = loader.get_template(templatePath+'page.html')
+    c = {}
+    c["page"] = getPageBySlug(slug)
+    c["categories"] = getCategories()
+    c["area"] = "pages"
+    c["pages"] = getPages()
+    
+    filesTemplate = loader.get_template(templatePath+"files.html")
+    c["files"] = filesTemplate.render(RequestContext(request, {'files':c['page'].pagefile_set.all()}))
+    
+    return HttpResponse(t.render(RequestContext(request, c)))
+
+################################################################################################################################
 
 import os
 
@@ -47,19 +107,10 @@ def thumb(request, w=-1, h=-1, path=""):
         return redirect(path)
     
     basename, extension = os.path.splitext(os.path.basename(path))
-    filename = thumbPath+basename+"_"+str(w)+"x"+str(h)+".png"
+    filename = thumbPath+basename+"_"+str(w)+"x"+str(h)+".jpg"
     
     if os.path.exists(filename) == False:
         imagefit = ImageOps.fit(image, (int(w), int(h)), Image.ANTIALIAS)
-        imagefit.save(filename, 'PNG', quality=80)
-    else:
-        return redirect(settings.MEDIA_URL+"thumbs/"+basename+"_"+str(w)+"x"+str(h)+".png")
-
-    data = open(filename, "rb").read()
-    return HttpResponse(data, mimetype="image/png")
-    '''
-    wrapper = FileWrapper(file(filename))
-    response = HttpResponse(wrapper, content_type='image/png')
-    response['Content-Length'] = os.path.getsize(filename)
-    return response
-    '''
+        imagefit.save(filename, 'JPEG', quality=88)
+    
+    return redirect(settings.MEDIA_URL+"thumbs/"+basename+"_"+str(w)+"x"+str(h)+".jpg")

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}posts{% endblock %}
+
+{% block content %}
+<div id="categories">
+    <a href="/cms/posts/" {% if activeCategory == None %}class="active"{% endif %}>ALL</a>
+{% for cat in categories%}
+    <a href="/cms/posts/{{cat.slug}}" {% if activeCategory == cat.slug %}class="active"{% endif %}>{{cat.name}}</a>
+{% endfor %}
+</div><br />
+
+<div id="posts">
+{% for post in posts %}
+    <a class="post" id="post{{ post.id }}" href="/cms/post/{{ post.slug }}">
+        <img src="/cms/thumb/160/160/{{ post.preview.path }}" width="200" height="170" />
+        <div class="info"><b>{{ post.title }}</b><br />{{ post.creation|date:"M d Y" }}</div>
+    </a>
+{% empty %}
+    <p>Sorry, no posts in this category.</p>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from django.db import models
-from taggit_autocomplete_modified.managers import TaggableManagerAutocomplete as TaggableManager
+from taggit.managers import TaggableManager
 from filebrowser.fields import FileBrowseField
 import mimetypes
 from undefcms.types import filetypes
@@ -39,7 +39,7 @@ class Content(models.Model):
     category = models.ManyToManyField(Category, blank=True, null=True)
     
     #image
-    preview = FileBrowseField("Preview", max_length=200, directory="images/", extensions=[".jpg",".jpeg", ".gif", ".png"], blank=True, null=True)
+    preview = FileBrowseField("Preview", max_length=200, directory="", extensions=[".jpg",".jpeg", ".gif", ".png"], blank=True, null=True)
     
     #header stuff
     header = models.TextField(blank=True)
@@ -89,7 +89,7 @@ class File(models.Model):
     description = models.TextField(blank = True, verbose_name="content")
     file = FileBrowseField("File", max_length=200, directory="", blank=True, null=True)
     index = models.PositiveIntegerField()
-    type = models.CharField(max_length = 128, blank = True, null = True, editable = True, choices = FILE_TYPE_CHOICES)
+    type = models.CharField(max_length = 128, blank = False, null = True, editable = True, choices = FILE_TYPE_CHOICES, default = "auto")
     extra = fields.JSONField(null=True, blank=True, editable = False)
     
     def save(self, *args, **kwargs):
