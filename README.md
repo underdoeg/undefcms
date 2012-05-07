@@ -14,8 +14,6 @@ Please see INSTALL.md for install instructions.
 ![Alt text](http://uploads.undef.ch/screenshotsUndefCMS/admin.png)  
 ##admin post list
 ![Alt text](http://uploads.undef.ch/screenshotsUndefCMS/adminPosts.png)
-##admin post detail
-![Alt text](http://uploads.undef.ch/screenshotsUndefCMS/adminPostDetail.png)
 ##default template index
 ![Alt text](http://uploads.undef.ch/screenshotsUndefCMS/index.png)
 ##default template detail
