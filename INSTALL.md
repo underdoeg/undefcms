@@ -50,3 +50,4 @@
 + fill in your DB and path setting then python manage.py syncdb && manage.py collectstatic
 + create a folder uploads/, thumbs/ and uploads/images in your MEDIA folder
 + run the server and insert your content in the admin page
++ now visit 127.0.0.1:8000/cms (or whatever your host is) This is a default template. Usually you'll want to write your own views and templates but you can use these as a starter.
