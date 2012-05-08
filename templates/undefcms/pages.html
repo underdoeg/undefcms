@@ -1,0 +1,17 @@
+{% extends "undefcms/base.html" %}
+
+{% block title %}pages{% endblock %}
+
+{% block content %}
+<div id="posts">
+{% for page in pages %}
+    <a class="post" id="post{{ page.id }}" href="/cms/page/{{ post.slug }}">
+        <img src="/cms/thumb/160/160/{{ page.preview.path }}" width="200" height="200" />
+        <div class="info"><b>{{ page.title }}</b><br />{{ page.creation|date:"M d Y" }}</div>
+    </a>
+{% empty %}
+    <p>Sorry, no pages in this category.</p>
+{% endfor %}
+
+</div>
+{% endblock %}

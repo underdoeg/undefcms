@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^pages/$', 'undefcms.views.pages', name='pages'),
     url(r'^pages/(?P<category>.*)$', 'undefcms.views.pages', name='pageCategory'),   
     url(r'^page/(?P<slug>.*)$', 'undefcms.views.page', name='page')
+    
 )
 
 urlpatterns += patterns('',

@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from models import *
 from utils import *
 
-templatePath = ""
+templatePath = "undefcms/"
 '''
 if hasattr(settings, 'CMS_TEMPLATE_PATH'):
     templatePath = settings.CMS_TEMPLATE_PATH
