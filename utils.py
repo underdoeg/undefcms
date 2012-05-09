@@ -63,7 +63,12 @@ def getPostsByCategory(catId):
     
 def getPostsByCategorySlug(slug):
     return getPostsByCategory(getCategoryIdBySlug(slug))
-    
+
+def getPostsByTags(tags):
+    if isinstance(tags, basestring):
+        tags = [tags,]
+    return getPosts().filter(tags_name_in=tags)
+
 def getPostIdBySlug(slug):
     return get_object_or_404(Post, slug__iexact=slug).id
     
@@ -122,6 +127,8 @@ def getImageWidth(path):
     
 def getThumbWidth(path, height):
     path = str(path)
+    if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
+        path = settings.MEDIA_ROOT+path
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)
@@ -132,10 +139,11 @@ def getThumbWidth(path, height):
     
 def getThumbHeight(path, width):
     path = str(path)
+    if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
+        path = settings.MEDIA_ROOT+path
     if not os.path.isfile(path):
         return 0
     image = Image.open(path)
-    return 0
     if image.size[0] < width:
         width = image.size[0]
     ratio = float(width)/float(image.size[0])
