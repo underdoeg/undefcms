@@ -50,19 +50,19 @@ def getPosts(showHidden = False, excludeCategories = []):
         ret = ret.filter(visible = True)
     return ret
 
-def getPostsByCategory(catId):
-    ret = getPosts()
+def getPostsByCategory(catId, showHidden=False):
+    ret = getPosts(showHidden=showHidden)
     if isinstance(catId, int) or isinstance(catId, long):
         return ret.filter(category=catId)
     else:
         if len(catId) is 0:
-            return getPosts()
+            return getPosts(showHidden=showHidden)
         for c in catId:
             ret = ret.filter(category=c)
         return ret
     
-def getPostsByCategorySlug(slug):
-    return getPostsByCategory(getCategoryIdBySlug(slug))
+def getPostsByCategorySlug(slug, showHidden=False):
+    return getPostsByCategory(getCategoryIdBySlug(slug), showHidden=showHidden)
 
 def getPostsByTags(tags):
     if isinstance(tags, basestring):
@@ -87,14 +87,17 @@ def searchPosts(query):
     )
 
 ##pages stuff
-def getPages():
-    return Page.objects.all().filter(visible = True)
+def getPages(showHidden=False):
+    if showHidden is False:
+        return Page.objects.all().filter(visible = True)
+    else:
+        return Page.objects.all()
 
-def getPagesByCategory(catId):
+def getPagesByCategory(catId, showHidden = False):
     return getPages().filter(category=catId)    
 
-def getPagesByCategorySlug(slug):
-    return getPagesByCategory(getCategoryIdBySlug(slug))
+def getPagesByCategorySlug(slug, showHidden=False):
+    return getPagesByCategory(getCategoryIdBySlug(slug), showHidden=showHidden)
 
 def getPageIdBySlug(slug):
     return get_object_or_404(Page, slug__iexact=slug).id
