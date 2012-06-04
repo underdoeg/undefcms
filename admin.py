@@ -16,10 +16,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent', 'visible')
+    list_display = ('name', 'parent', 'visible', 'index')
     list_filter = ('visible', 'parent')
     search_fields = ('name','description')
     prepopulated_fields = {"slug": ("name",)}
+    
+    list_editable = ('index',)  # 'position' is the name of the model field which holds the position of an element
+
 
 class ContentAdmin(admin.ModelAdmin):
     form = ContentForm

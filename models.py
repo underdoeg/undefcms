@@ -15,13 +15,14 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     parent = models.ForeignKey("self", blank=True, null=True)
     visible = models.BooleanField(default=True)
-    
+    index = models.PositiveIntegerField(default = 0)
+
     def __unicode__(self):
         return self.name
     
     class Meta:
         verbose_name_plural = "Categories"
-        ordering = ("name",)
+        ordering = ("index", "name",)
 
 #DEFINITIONS FOR COMMON PAGE AND POST FIELDS
 class Content(models.Model):
@@ -69,7 +70,7 @@ class Page(Content):
         return self.title
     
     class Meta:
-        ordering = ("index", )
+        ordering = ("index", "title")
         
     def getFiles(self):
         return self.pagefile_set.all()
