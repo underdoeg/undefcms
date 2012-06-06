@@ -1,12 +1,18 @@
 from django.db import models
 from taggit.managers import TaggableManager
 from filebrowser.fields import FileBrowseField
+from filebrowser.base import FileListing, FileObject
 import mimetypes
 from undefcms.types import filetypes
 import commands
 import fields
 from django.conf import settings
 import re
+from filebrowser.settings import MEDIA_ROOT
+import os
+
+# import the logging library
+import logging
 
 #CATEGORY
 class Category(models.Model):
@@ -81,7 +87,8 @@ FILE_TYPE_CHOICES = (
     ('img', filetypes['image']),
     ('html', filetypes['html']),
     ('video', filetypes['video']),
-    ('audio', filetypes['audio'])
+    ('audio', filetypes['audio']),
+    ('listfolder', 'listfolder')
 )
 
 #FILE
@@ -94,6 +101,8 @@ class File(models.Model):
     extra = fields.JSONField(null=True, blank=True, editable = False)
     
     def save(self, *args, **kwargs):
+        logger = logging.getLogger("undefcms")
+        
         if self.file:
             mime = mimetypes.guess_type(self.file.path)[0]
             if self.extra is None:
@@ -125,6 +134,29 @@ class File(models.Model):
                     self.type = filetypes["audio"]
                 else:
                     self.type = mime
+            
+            if self.type == "listfolder":
+                logger.debug("LOOKING THRU "+MEDIA_ROOT+self.file.path)
+                
+                def filter(item):
+                    return item.is_version != True
+                
+                filelisting = FileListing(MEDIA_ROOT+self.file.path,  sorting_by='name', sorting_order='desc', filter_func=filter)
+                for item in filelisting.files_walk_filtered():
+                    #logger.debug(type(self) == type(PostFile))
+                    #logger.debug(isinstance(self, PageFile))
+                    newFile = None
+                    if isinstance(self, PageFile):
+                        newFile = PageFile(page=self.page)
+                    if isinstance(self, PostFile):
+                        newFile = PostFile(post = self.post)
+                    if newFile is not None:
+                        newFile.index = self.index
+                        newFile.file = FileObject(os.path.join(self.file.path, item.filename))
+                        newFile.save()
+                
+                self.delete()
+                return
             self.extra["lastFile"] = self.file.filename
         super(File, self).save(*args, **kwargs)
     
