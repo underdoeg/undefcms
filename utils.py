@@ -60,9 +60,16 @@ def getPostsByCategory(catId, showHidden=False):
         for c in catId:
             ret = ret.filter(category=c)
         return ret
-    
+
 def getPostsByCategorySlug(slug, showHidden=False):
     return getPostsByCategory(getCategoryIdBySlug(slug), showHidden=showHidden)
+    
+def getPostsGroupedByCategory():
+    ret = []
+    categories = getCategories()
+    for cat in categories:
+        ret.append({'category':cat, 'posts':getPostsByCategory(cat.id)})
+    return ret
 
 def getPostsByTags(tags):
     if isinstance(tags, basestring):
