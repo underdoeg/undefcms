@@ -86,6 +86,9 @@ def searchPosts(query):
         Q(content__icontains = query),
     )
 
+def getPostFile(id):
+    return get_object_or_404(PostFile, pk=id)
+
 ##pages stuff
 def getPages(showHidden=False):
     if showHidden is False:

@@ -154,8 +154,8 @@ class File(models.Model):
                         newFile.index = self.index
                         newFile.file = FileObject(os.path.join(self.file.path, item.filename))
                         newFile.save()
-                
-                self.delete()
+                if self.id > 0:
+                    self.delete()
                 return
             self.extra["lastFile"] = self.file.filename
         super(File, self).save(*args, **kwargs)
