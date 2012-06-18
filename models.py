@@ -100,6 +100,9 @@ class File(models.Model):
     type = models.CharField(max_length = 128, blank = False, null = True, editable = True, choices = FILE_TYPE_CHOICES, default = "auto")
     extra = fields.JSONField(null=True, blank=True, editable = False)
     
+    def content(self):
+        return self.description
+    
     def save(self, *args, **kwargs):
         logger = logging.getLogger("undefcms")
         
