@@ -19,4 +19,17 @@ def thumb_height(path, height):
 @register.simple_tag 
 def thumb_width(path, width):
     return getThumbWidth(path, width)
+    
+@register.filter
+def thumbUrl(obj, widthHeight):
+    split = widthHeight.split(",")
+    return obj.thumbUrl(int(split[0]), int(split[1]))
+    
+@register.filter
+def thumbUrlWidth(obj, w):
+    return obj.thumbUrl(width=w)
+    
+@register.filter
+def thumbUrlHeight(obj, h):
+    return obj.thumbUrl(height=h)
 #register.tag(thumb_width)

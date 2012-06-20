@@ -161,3 +161,68 @@ def getThumbHeight(path, width):
         width = image.size[0]
     ratio = float(width)/float(image.size[0])
     return int(ratio*int(image.size[1]))
+
+def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
+    #calculate image size
+    offsetX = 0
+    offsetY = 0
+    widthNonCrop = 0
+    heightNonCrop = 0
+    if width is None or height is None:
+        if width is None:
+            width = int(height/float(imgHeight)*imgWidth)
+            
+        if height is None:
+            height = int(width/float(imgWidth)*imgHeight)
+    else:
+        if width > height:
+            heightNonCrop = int(width/float(imgWidth)*imgHeight)
+            widthNonCrop = width
+            offsetY = int((heightNonCrop-height)/2)
+        else:
+            widthNonCrop = int(height/float(imgHeight)*imgWidth)
+            heightNonCrop = height
+            offsetX = int((widthNonCrop-width)/2)
+    
+    #get correct file paths
+    path = path.replace(settings.MEDIA_ROOT, "")
+    thumbPath = settings.MEDIA_ROOT+"thumbs/"+path
+    basename, extension = os.path.splitext(thumbPath)
+    thumbPath = basename+"_"+str(width)+"x"+str(height)+".jpg"
+    
+    if hasattr(settings, "NO_THUMB_CACHING") and settings.NO_THUMB_CACHING == True:
+        if os.path.exists(thumbPath):
+            os.remove(thumbPath)
+    
+    #now check if the path exists and if not, create the image
+    if not os.path.exists(thumbPath):
+        folder = os.path.dirname(thumbPath)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+            
+        if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
+            path = settings.MEDIA_ROOT+path
+        
+        if hasattr(settings, "USE_IMAGEMAGICK") and settings.USE_IMAGEMAGICK == True:
+            #return "convert "+path+" -resize "+str(width)+"x"+str(height)+" "+thumbPath
+            if offsetX != 0 or offsetY != 0:
+                os.system("convert "+path+" -resize "+str(widthNonCrop)+"x"+str(heightNonCrop)+"! -crop "+str(width)+"x"+str(height)+"+"+str(offsetX)+"+"+str(offsetY)+" "+thumbPath)
+            else:
+                os.system("convert "+path+" -resize "+str(width)+"x"+str(height)+"! "+thumbPath)
+        else:
+            try:
+                from PIL import Image, ImageOps
+            except ImportError:
+                import Image
+                import ImageOps
+            image = Image.open(path)
+            if offsetX != 0 or offsetY != 0:
+                image = image.resize((widthNonCrop, heightNonCrop), Image.ANTIALIAS)
+                image = image.crop((offsetX, offsetY, offsetX+width, offsetY+height))
+            else:
+                image = image.resize((width, height), Image.ANTIALIAS)
+            image.save(thumbPath, "JPEG", quality=85)
+    return thumbPath
+    #return offsetX, offsetY
+def getThumbUrl(path, imgWidth, imgHeight, width=None, height=None):
+    return getThumbPath(path, imgWidth, imgHeight, width, height).replace(settings.MEDIA_ROOT, settings.MEDIA_URL)

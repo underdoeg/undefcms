@@ -138,6 +138,10 @@ class File(models.Model):
                 else:
                     self.type = mime
             
+            if self.type == "img":
+                self.extra["width"] = self.file.width
+                self.extra["height"] = self.file.height
+            
             if self.type == "listfolder":
                 logger.debug("LOOKING THRU "+MEDIA_ROOT+self.file.path)
                 
@@ -165,6 +169,42 @@ class File(models.Model):
     
     def __unicode__(self):
         return self.name
+    
+    def thumbUrl(self, width = None, height = None):
+        if self.type != "img":
+            return "no image"
+        
+        from utils import getThumbUrl
+
+        #get width and height
+        imgWidth = 0
+        imgHeight = 0
+        if "width" in self.extra:
+            imgWidth = self.extra["width"]
+        if "height" in self.extra:
+            imgHeight = self.extra["height"]
+            
+        saveIt = False
+        if imgWidth == 0:
+            imgWidth = self.file.width
+            self.extra["width"] = imgWidth
+            saveIt = True
+            
+        if imgHeight == 0:
+            imgHeight = self.file.height
+            self.extra["height"] = imgHeight
+            saveIt = True
+        
+        if saveIt:
+            self.save()
+        
+        if width>imgWidth:
+            width = imgWidth
+        
+        if height>imgHeight:
+            height = imgHeight
+        
+        return getThumbUrl(self.file.path, imgWidth, imgHeight, width, height)
     
     class Meta:
         ordering = ('index',)
