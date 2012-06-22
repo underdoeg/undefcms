@@ -4,9 +4,7 @@
     {% for file in files %}
         <h2>{{file.name}}</h2>
         {% if file.type == "img" %}
-            <img src="{{ file|thumbUrl:"500,100" }}"/><br/>
             <img src="{{ file|thumbUrlWidth:400 }}"/><br/>
-            <img src="{{ file|thumbUrlHeight:400 }}"/><br/>
         {% endif %}
         {% if file.type == "video" %}
             <p>VIDEO IS NOT YET IMPLEMENTED</p><br/>

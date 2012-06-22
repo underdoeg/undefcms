@@ -168,6 +168,7 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
     offsetY = 0
     widthNonCrop = 0
     heightNonCrop = 0
+    
     if width is None or height is None:
         if width is None:
             width = int(height/float(imgHeight)*imgWidth)
@@ -175,7 +176,7 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
         if height is None:
             height = int(width/float(imgWidth)*imgHeight)
     else:
-        if width > height:
+        if imgWidth < imgHeight:
             heightNonCrop = int(width/float(imgWidth)*imgHeight)
             widthNonCrop = width
             offsetY = int((heightNonCrop-height)/2)
@@ -223,6 +224,6 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
                 image = image.resize((width, height), Image.ANTIALIAS)
             image.save(thumbPath, "JPEG", quality=85)
     return thumbPath
-    #return offsetX, offsetY
+    #return str(offsetY)
 def getThumbUrl(path, imgWidth, imgHeight, width=None, height=None):
     return getThumbPath(path, imgWidth, imgHeight, width, height).replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
