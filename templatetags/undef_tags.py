@@ -32,4 +32,12 @@ def thumbUrlWidth(obj, w):
 @register.filter
 def thumbUrlHeight(obj, h):
     return obj.thumbUrl(height=h)
+    
+@register.filter
+def thumbHeight(obj, w):
+    return obj.thumbHeight(w)
+
+@register.filter
+def thumbWidth(obj, h):
+    return obj.thumbWidth(h)
 #register.tag(thumb_width)

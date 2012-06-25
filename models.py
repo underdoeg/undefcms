@@ -170,13 +170,11 @@ class File(models.Model):
     def __unicode__(self):
         return self.name
     
-    def thumbUrl(self, width = None, height = None):
+    def dimensions(self):
         if self.type != "img":
-            return "no image"
+            return 0, 0
         
-        from utils import getThumbUrl
-
-        #get width and height
+         #get width and height
         imgWidth = 0
         imgHeight = 0
         if "width" in self.extra:
@@ -197,6 +195,16 @@ class File(models.Model):
         
         if saveIt:
             self.save()
+            
+        return imgWidth, imgHeight
+    
+    def thumbUrl(self, width = None, height = None):
+        if self.type != "img":
+            return "no image"
+        
+        imgWidth, imgHeight = self.dimensions()
+        
+        from utils import getThumbUrl
         
         if width>imgWidth:
             width = imgWidth
@@ -210,10 +218,20 @@ class File(models.Model):
         ordering = ('index',)
         abstract = True
     
+    def thumbWidth(self, height):
+        imgWidth, imgHeight = self.dimensions()
+        if height>imgHeight:
+            height = imgHeight
+        return int(height/float(imgHeight)*imgWidth)
+
+    def thumbHeight(self, width):
+        imgWidth, imgHeight = self.dimensions()
+        if width>imgWidth:
+            width = imgWidth
+        return int(width/float(imgWidth)*imgHeight)
+    
 class PageFile(File):
     page = models.ForeignKey(Page)
 
 class PostFile(File):
     post = models.ForeignKey(Post)
-    
-    
