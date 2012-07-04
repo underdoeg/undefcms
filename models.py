@@ -232,6 +232,30 @@ class File(models.Model):
     
 class PageFile(File):
     page = models.ForeignKey(Page)
+    
+    def getNext(self):
+        next_queryset = PageFile.objects.filter(page=self.page, index__gt=self.index)
+        if next_queryset.count() > 0:
+            return next_queryset.order_by('index')[0]
+        return None
+    
+    def getPrev(self):
+        next_queryset = PageFile.objects.filter(page=self.page, index__lt=self.index)
+        if next_queryset.count() > 0:
+            return next_queryset.order_by('-index')[0]
+        return None
 
 class PostFile(File):
     post = models.ForeignKey(Post)
+    
+    def getNext(self):
+        next_queryset = PostFile.objects.filter(post=self.post, index__gt=self.index)
+        if next_queryset.count() > 0:
+            return next_queryset.order_by('index')[0]
+        return None
+    
+    def getPrev(self):
+        next_queryset = PostFile.objects.filter(post=self.post, index__lt=self.index)
+        if next_queryset.count() > 0:
+            return next_queryset.order_by('-index')[0]
+        return None
