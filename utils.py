@@ -204,12 +204,16 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
         if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
             path = settings.MEDIA_ROOT+path
         
+        quality = 83
+        if hasattr(settings, "THUMB_QUALITY"):
+            quality = int(settings.THUMB_QUALITY)
+        
         if hasattr(settings, "USE_IMAGEMAGICK") and settings.USE_IMAGEMAGICK == True:
             #return "convert "+path+" -resize "+str(width)+"x"+str(height)+" "+thumbPath
             if offsetX != 0 or offsetY != 0:
-                os.system("convert "+path+" -resize "+str(widthNonCrop)+"x"+str(heightNonCrop)+"! -crop "+str(width)+"x"+str(height)+"+"+str(offsetX)+"+"+str(offsetY)+" "+thumbPath)
+                os.system("convert "+path+" -resize "+str(widthNonCrop)+"x"+str(heightNonCrop)+"! -crop "+str(width)+"x"+str(height)+"+"+str(offsetX)+"+"+str(offsetY)+" -quality "+str(quality)+" "+thumbPath)
             else:
-                os.system("convert "+path+" -resize "+str(width)+"x"+str(height)+"! "+thumbPath)
+                os.system("convert "+path+" -resize "+str(width)+"x"+str(height)+"! -quality "+str(quality)+" "+thumbPath)
         else:
             try:
                 from PIL import Image, ImageOps
@@ -222,8 +226,9 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
                 image = image.crop((offsetX, offsetY, offsetX+width, offsetY+height))
             else:
                 image = image.resize((width, height), Image.ANTIALIAS)
-            image.save(thumbPath, "JPEG", quality=85)
+            image.save(thumbPath, "JPEG", quality=quality)
     return thumbPath
+
     #return str(offsetY)
 def getThumbUrl(path, imgWidth, imgHeight, width=None, height=None):
     return getThumbPath(path, imgWidth, imgHeight, width, height).replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
