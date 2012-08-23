@@ -88,6 +88,7 @@ FILE_TYPE_CHOICES = (
     ('html', filetypes['html']),
     ('video', filetypes['video']),
     ('audio', filetypes['audio']),
+    ('text', filetypes['text']),
     ('listfolder', 'listfolder')
 )
 

@@ -4,5 +4,6 @@ filetypes = {
     'js': "js",
     'css': "css",
     'html': "html",
-    'audio': "audio"
+    'audio': "audio",
+    'text': "text"
 }
