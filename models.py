@@ -177,6 +177,11 @@ class File(models.Model):
          #get width and height
         imgWidth = 0
         imgHeight = 0
+        
+        if self.extra is None:
+            self.extra =  {}
+            saveIt = True
+            
         if "width" in self.extra:
             imgWidth = self.extra["width"]
         if "height" in self.extra:
@@ -195,7 +200,7 @@ class File(models.Model):
         
         if saveIt:
             self.save()
-            
+        
         return imgWidth, imgHeight
     
     def thumbUrl(self, width = None, height = None):
