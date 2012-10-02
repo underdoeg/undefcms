@@ -287,24 +287,24 @@ def sendBackup(email="philip@undef.ch"):
     for name, database in database_list.iteritems():
         db.backup(database, os.path.join(database_root, name))
     
-    with closing(tarfile.open(archiveFile, 'w:gz')) as tf:
-        tf.add(database_root, arcname="backup/databases")
-        
-        for post in Post.objects.all():
-            for file in post.getFiles():
-                if file.file:
-                    if file.type != filetypes["video"]:
-                        tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
-            if post.preview:
-                tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
-        
-        for post in Page.objects.all():
-            for file in post.getFiles():
-                if file.file:
-                    if file.type != filetypes["video"]:
-                        tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
-            if post.preview:
-                tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+    tf = tarfile.open(archiveFile, 'w:gz')
+    tf.add(database_root, arcname="backup/databases")
+    
+    for post in Post.objects.all():
+        for file in post.getFiles():
+            if file.file:
+                if file.type != filetypes["video"]:
+                    tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+        if post.preview:
+            tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+    
+    for post in Page.objects.all():
+        for file in post.getFiles():
+            if file.file:
+                if file.type != filetypes["video"]:
+                    tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+        if post.preview:
+            tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
     
     email = EmailMessage('Backup', 'Your backup is in the attachment. Only images that are attached to a post or page are included in the archive. Videos are not backuped.', 'undefcms@undef.ch', [email,])
     email.attach_file(archiveFile)
