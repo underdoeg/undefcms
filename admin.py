@@ -36,15 +36,15 @@ class ContentAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('title & infos',{
-            #'classes': ('collapse open',),
+            #'classes': ('grp-collapse grp-open',),
             'fields': (('title', 'slug','visible'), ('preview', 'creation'), ('category', 'tags'))
         }),
         ('content', {
-            'classes': ('collapse closed',),
+            'classes': ('grp-collapse grp-closed',),
             'fields':  ('content', 'description'),
         }),
         ('header', {
-            'classes': ('collapse closed',),
+            'classes': ('grp-collapse grp-closed',),
             'fields' : ('header','javascript','css',),
         }),
     )
@@ -90,7 +90,7 @@ class StackedFileInline(InlineModelAdmin):
     sortable_field_name = 'index'
     extra = 0
     ordering = ['index']
-    classes = ('collapse open',)
+    classes = ('grp-collapse grp-open',)
     form = FileForm
     fields = ('name','description', 'file', 'type', 'index')
     
@@ -112,15 +112,15 @@ class PageAdmin(ContentAdmin):
     '''
     fieldsets = (
         ('title & infos',{
-            #'classes': ('collapse open',),
+            #'classes': ('grp-collapse grp-open',),
             'fields': (('title', 'slug','visible'), ('preview', 'creation', 'index'), ('parent', 'category', 'tags'))
         }),
         ('content', {
-            'classes': ('collapse closed',),
+            'classes': ('grp-collapse grp-closed',),
             'fields':  ('content', 'description'),
         }),
         ('header', {
-            'classes': ('collapse closed',),
+            'classes': ('grp-collapse grp-closed',),
             'fields' : ('header','javascript','css',),
         }),
     )
