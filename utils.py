@@ -169,6 +169,12 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
     widthNonCrop = 0
     heightNonCrop = 0
     
+    if imgWidth < width:
+        width = imgWidth
+    
+    if imgHeight < height:
+        height = imgHeight
+    
     if width is None or height is None:
         if width is None:
             width = int(height/float(imgHeight)*imgWidth)
