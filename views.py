@@ -62,6 +62,12 @@ def page(request, slug):
     
     return HttpResponse(t.render(RequestContext(request, c)))
 
+def backup(request, email):
+    if sendBackup(email) == True:
+        return HttpResponse("backup sent to "+email)
+    else:
+        return HttpResponse("could not send backup to "+email)
+
 ################################################################################################################################
 
 import os
@@ -73,7 +79,6 @@ except ImportError:
     import ImageOps
 
 def thumb(request, w=None, h=None, path=""):
-    
     if path == "":
         path = settings.STATIC_ROOT+"img/image_not_found.jpg"
     if not path.startswith(settings.MEDIA_ROOT) and not path.startswith(settings.STATIC_ROOT):
@@ -84,3 +89,6 @@ def thumb(request, w=None, h=None, path=""):
     if w != None:
         w = int(w)
     return redirect(getThumbUrl(path, image.size[0], image.size[1], w, h))
+    
+
+    

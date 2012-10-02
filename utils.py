@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.db.models import Q
 import os.path
+from undefcms.types import filetypes
 
 def getCategoriesRecursiveHelper(parent, activeId):
     if parent == None:
@@ -238,3 +239,76 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
     #return str(offsetY)
 def getThumbUrl(path, imgWidth, imgHeight, width=None, height=None):
     return getThumbPath(path, imgWidth, imgHeight, width, height).replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
+    
+    
+################################################################################################################################
+## BACKUP
+## based on https://github.com/stbarnabas/django-backup/
+
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from tempfile import mkdtemp
+import db
+import tarfile
+from datetime import datetime
+
+
+def sendBackup(email="philip@undef.ch"):
+    ok = True
+        
+    #get db settings    
+    if hasattr(settings, 'DATABASES'):
+        database_list = settings.DATABASES
+    else:
+        # database details are in the old format, so convert to the new one
+        database_list = {
+            'default': {
+                'ENGINE': settings.DATABASE_ENGINE,
+                'NAME': settings.DATABASE_NAME,
+                'USER': settings.DATABASE_USER,
+                'PASSWORD': settings.DATABASE_PASSWORD,
+                'HOST': settings.DATABASE_HOST,
+                'PORT': settings.DATABASE_PORT,
+            }
+        }
+    
+    mediaRoot = settings.MEDIA_ROOT
+    
+    backupPath = mediaRoot+"backups/"
+    if not os.path.exists(backupPath):
+        os.makedirs(backupPath)
+    
+    archiveFile = backupPath+"backup-"+datetime.now().strftime("%m-%d-%Y")+".tgz"
+    
+    backup_root = mkdtemp()
+    database_root = os.path.join(backup_root, 'databases')
+    os.mkdir(database_root)
+    
+    for name, database in database_list.iteritems():
+        db.backup(database, os.path.join(database_root, name))
+    
+    with tarfile.open(archiveFile, 'w:gz') as tf:
+        tf.add(database_root, arcname="backup/databases")
+        
+        for post in Post.objects.all():
+            for file in post.getFiles():
+                if file.file:
+                    if file.type != filetypes["video"]:
+                        tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+            if post.preview:
+                tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+        
+        for post in Page.objects.all():
+            for file in post.getFiles():
+                if file.file:
+                    if file.type != filetypes["video"]:
+                        tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+            if post.preview:
+                tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+    
+    email = EmailMessage('Backup', 'Your backup is in the attachment. Only images that are attached to a post or page are included in the archive. Videos are not backuped.', 'undefcms@undef.ch', [email,])
+    email.attach_file(archiveFile)
+    if email.send() == False:
+        ok = False
+    
+    return ok
