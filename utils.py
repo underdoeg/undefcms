@@ -251,7 +251,7 @@ from tempfile import mkdtemp
 import db
 import tarfile
 from datetime import datetime
-
+from contextlib import closing
 
 def sendBackup(email="philip@undef.ch"):
     ok = True
@@ -287,7 +287,7 @@ def sendBackup(email="philip@undef.ch"):
     for name, database in database_list.iteritems():
         db.backup(database, os.path.join(database_root, name))
     
-    with tarfile.open(archiveFile, 'w:gz') as tf:
+    with closing(tarfile.open(archiveFile, 'w:gz')) as tf:
         tf.add(database_root, arcname="backup/databases")
         
         for post in Post.objects.all():
