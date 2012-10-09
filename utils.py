@@ -167,6 +167,15 @@ def getThumbHeight(path, width):
     return int(ratio*int(image.size[1]))
 
 def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
+    #get correct file paths
+    path = path.replace(settings.MEDIA_ROOT, "")
+    thumbPath = settings.MEDIA_ROOT+"thumbs/"+path
+    basename, extension = os.path.splitext(thumbPath)
+    thumbPath = basename+"_"+str(width)+"x"+str(height)+".jpg"
+    
+    if not os.path.exists(settings.MEDIA_ROOT+path):
+        return ""
+    
     #calculate image size
     offsetX = 0
     offsetY = 0
@@ -195,12 +204,6 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
             heightNonCrop = height
             offsetX = int((widthNonCrop-width)/2)
     
-    #get correct file paths
-    path = path.replace(settings.MEDIA_ROOT, "")
-    thumbPath = settings.MEDIA_ROOT+"thumbs/"+path
-    basename, extension = os.path.splitext(thumbPath)
-    thumbPath = basename+"_"+str(width)+"x"+str(height)+".jpg"
-    
     if hasattr(settings, "NO_THUMB_CACHING") and settings.NO_THUMB_CACHING == True:
         if os.path.exists(thumbPath):
             os.remove(thumbPath)
@@ -221,9 +224,9 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
         if hasattr(settings, "USE_IMAGEMAGICK") and settings.USE_IMAGEMAGICK == True:
             #return "convert "+path+" -resize "+str(width)+"x"+str(height)+" "+thumbPath
             if offsetX != 0 or offsetY != 0:
-                os.system("convert "+path+" -resize "+str(widthNonCrop)+"x"+str(heightNonCrop)+"! -crop "+str(width)+"x"+str(height)+"+"+str(offsetX)+"+"+str(offsetY)+" -quality "+str(quality)+" "+thumbPath)
+                os.system("convert '"+path+"' -resize "+str(widthNonCrop)+"x"+str(heightNonCrop)+"! -crop "+str(width)+"x"+str(height)+"+"+str(offsetX)+"+"+str(offsetY)+" -quality "+str(quality)+" '"+thumbPath+"'")
             else:
-                os.system("convert "+path+" -resize "+str(width)+"x"+str(height)+"! -quality "+str(quality)+" "+thumbPath)
+                os.system("convert '"+path+"' -resize "+str(width)+"x"+str(height)+"! -quality "+str(quality)+" '"+thumbPath+"'")
         else:
             try:
                 from PIL import Image, ImageOps
@@ -261,13 +264,14 @@ def convertVideo(filePath, w, h):
     if os.path.exists(convertPath+fileName+".ogv"):
         os.remove(convertPath+fileName+".ogv")
     
-    comMP4 = "ffmpeg -i "+fullPath+" -b 1500k -vcodec libx264 -vpre slow -g 30 -s "+str(w)+"x"+str(h)+" "+convertPath+fileName+".mp4"
-    comOgg = "ffmpeg -y -i "+fullPath+" -b 1500k -vcodec libtheora  -s "+str(w)+"x"+str(h)+" "+convertPath+fileName+".ogv"
+    comMP4 = "ffmpeg -i '"+fullPath+"' -b 1500k -vcodec libx264 -vpre slow -g 30 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".mp4'"
+    comOgg = "ffmpeg -y -i '"+fullPath+"' -b 1500k -vcodec libtheora  -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".ogv'"
+    comWebm = "ffmpeg -i '"+fullPath+"'  -b 1500k -vcodec libvpx -acodec libvorbis -ab 160000 -f webm -g 30 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".webm'"
     #res = commands.getoutput(comMP4)
     #return res
     
     os.system(comMP4+" & ")
-    os.system(comOgg+" & ")
+    os.system(comWebm+" & ")
     
 ################################################################################################################################
 ## BACKUP

@@ -130,7 +130,9 @@ class File(models.Model):
             
             if oldMd5 != self.extra["md5"]:
                 isFileNew = True
-                        
+            
+            isFileNew = True
+            
             if self.type == "auto": #We don't know the mime type yet. try to guess it
                 if mime == "image/jpeg" or mime == "image/png" or mime == "image/gif":
                     self.type = filetypes["image"]
@@ -176,10 +178,15 @@ class File(models.Model):
             if self.type == "video":
                 if isFileNew:
                     #get width and height of video
-                    res = commands.getoutput("ffmpeg -i "+settings.MEDIA_ROOT+self.file.path)
+                    res = commands.getoutput("ffmpeg -i \""+settings.MEDIA_ROOT+self.file.path+"\"")
                     dimFind = re.findall(r'( \d+x\d+ )', res)
+                    if len(dimFind) is 0:
+                        dimFind = re.findall(r'(\d+x\d+)', res)
                     width = 0
                     height = 0
+                    self.extra["width"] = 0
+                    self.extra["height"] = 0
+                    self.extra["blah"] = "ffmpeg -i '"+settings.MEDIA_ROOT+self.file.path+"'"
                     if len(dimFind) is not 0:
                         dim = dimFind[0].split("x")
                         width = dim[0]
@@ -215,12 +222,12 @@ class File(models.Model):
             imgHeight = self.extra["height"]
             
         saveIt = False
-        if imgWidth == 0:
+        if imgWidth == 0 or imgWidth == None:
             imgWidth = self.file.width
             self.extra["width"] = imgWidth
             saveIt = True
             
-        if imgHeight == 0:
+        if imgHeight == 0 or imgHeight == None:
             imgHeight = self.file.height
             self.extra["height"] = imgHeight
             saveIt = True
@@ -234,6 +241,9 @@ class File(models.Model):
         if self.type != "img":
             return "no image"
         
+        if width == None and height == None:
+            width = 10
+        
         imgWidth, imgHeight = self.dimensions()
         
         from utils import getThumbUrl
@@ -245,6 +255,15 @@ class File(models.Model):
             height = imgHeight
         
         return getThumbUrl(self.file.path, imgWidth, imgHeight, width, height)
+    
+    def videoOggUrl(self):
+        return settings.MEDIA_URL+"encodedVideos/"+self.file.path+".ogv"
+
+    def videoMp4Url(self):
+        return settings.MEDIA_URL+"encodedVideos/"+self.file.path+".mp4"
+    
+    def videoWebmUrl(self):
+        return settings.MEDIA_URL+"encodedVideos/"+self.file.path+".webm"
     
     class Meta:
         ordering = ('index',)
