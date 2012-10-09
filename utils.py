@@ -5,6 +5,7 @@ from django.db.models import Q
 import os.path
 from undefcms.types import filetypes
 
+#categories
 def getCategoriesRecursiveHelper(parent, activeId):
     if parent == None:
         set = Category.objects.filter(parent__isnull=True, visible=True)
@@ -40,6 +41,7 @@ def getCategory(id=-1, slug=""):
     else:
         return get_object_or_404(Category, pk=id)
 
+#posts
 def getPosts(showHidden = False, excludeCategories = []):
     ret = Post.objects.all()
     for exclude in excludeCategories:
@@ -97,7 +99,7 @@ def searchPosts(query):
 def getPostFile(id):
     return get_object_or_404(PostFile, pk=id)
 
-##pages stuff
+#pages
 def getPages(showHidden=False):
     if showHidden is False:
         return Page.objects.all().filter(visible = True)
@@ -124,7 +126,8 @@ def getPageBySlug(slug):
 def getPagesByParentSlug(slug):
     return getPages().filter(parent__slug=slug)
 
-##image stuff
+################################################################################################################################
+## THUMB CREATION
 try:
     from PIL import Image, ImageOps
 except ImportError:
@@ -239,7 +242,32 @@ def getThumbPath(path, imgWidth, imgHeight, width=None, height=None):
     #return str(offsetY)
 def getThumbUrl(path, imgWidth, imgHeight, width=None, height=None):
     return getThumbPath(path, imgWidth, imgHeight, width, height).replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
+
+
+################################################################################################################################
+## VIDEO CONVERSION
+def convertVideo(filePath, w, h):
+    filePath = filePath.replace(settings.MEDIA_ROOT, "")
+    fullPath = settings.MEDIA_ROOT+filePath
+    fileDir, fileName = os.path.split(filePath)
+    fileDir += "/"
+    convertPath = settings.MEDIA_ROOT+"encodedVideos/"+fileDir
     
+    if not os.path.exists(convertPath):
+        os.makedirs(convertPath)
+    
+    if os.path.exists(convertPath+fileName+".mp4"):
+        os.remove(convertPath+fileName+".mp4")
+    if os.path.exists(convertPath+fileName+".ogv"):
+        os.remove(convertPath+fileName+".ogv")
+    
+    comMP4 = "ffmpeg -i "+fullPath+" -b 1500k -vcodec libx264 -vpre slow -g 30 -s "+str(w)+"x"+str(h)+" "+convertPath+fileName+".mp4"
+    comOgg = "ffmpeg -y -i "+fullPath+" -b 1500k -vcodec libtheora  -s "+str(w)+"x"+str(h)+" "+convertPath+fileName+".ogv"
+    #res = commands.getoutput(comMP4)
+    #return res
+    
+    os.system(comMP4+" & ")
+    os.system(comOgg+" & ")
     
 ################################################################################################################################
 ## BACKUP

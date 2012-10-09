@@ -10,6 +10,7 @@ from django.conf import settings
 import re
 from filebrowser.settings import MEDIA_ROOT
 import os
+import md5
 
 # import the logging library
 import logging
@@ -93,6 +94,11 @@ FILE_TYPE_CHOICES = (
 )
 
 #FILE
+def getHash(file):
+    output = commands.getoutput("md5sum "+file)
+    split = output.split(" ")
+    return split[0]
+
 class File(models.Model):
     name = models.CharField(max_length = 512, blank=True)
     description = models.TextField(blank = True, verbose_name="content")
@@ -107,41 +113,42 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         logger = logging.getLogger("undefcms")
         
+        isFileNew = False
+        
         if self.file:
+            #get the mime
             mime = mimetypes.guess_type(self.file.path)[0]
             if self.extra is None:
                 self.extra = {}
             self.extra["mime"] = mime
+            if not "md5" in self.extra:
+                self.extra["md5"] = ""
             
+            #get the md5 hash
+            oldMd5 = self.extra["md5"]
+            self.extra["md5"] = getHash(settings.MEDIA_ROOT+self.file.path)
+            
+            if oldMd5 != self.extra["md5"]:
+                isFileNew = True
+                        
             if self.type == "auto": #We don't know the mime type yet. try to guess it
                 if mime == "image/jpeg" or mime == "image/png" or mime == "image/gif":
                     self.type = filetypes["image"]
                 elif mime == "video/mp4":
                     self.type = filetypes["video"]
-                    if self.extra.has_key("lastFile") is False or self.extra["lastFile"] != self.file.filename or settings.DEBUG:
-                        res = commands.getoutput("ffmpeg -i "+self.file.path)
-                        dimFind = re.findall(r'(\d+x\d+)', res)
-                        if len(dimFind) is not 0:
-                            dim = dimFind[0].split("x")
-                            width = dim[0]
-                            height = dim[1]
-                            self.extra["width"] = width
-                            self.extra["height"] = height
-                        '''
-                        #time to encode
-                        videoPath = settings.MEDIA_ROOT+"encodedVideos/"
-                        comOGG = "ffmpeg -i "+self.file.path+" -acodec libvorbis -ac 2 -ab 96k -ar 44100 -b 345k -s "+dimFind[0]+" "+videoPath+self.file.filename+".ogv"
-                        res = commands.getoutput(comOGG)
-                        self.extra["encodeMsg"] = res
-                        '''
+                elif mime == "video/ogg":
+                    self.type = filetypes["video"]
+                elif mime == "video/avi":
+                    self.type = filetypes["video"]
                 elif mime == 'audio/mpeg':
                     self.type = filetypes["audio"]
                 else:
                     self.type = mime
             
             if self.type == "img":
-                self.extra["width"] = self.file.width
-                self.extra["height"] = self.file.height
+                if isFileNew:
+                    self.extra["width"] = self.file.width
+                    self.extra["height"] = self.file.height
             
             if self.type == "listfolder":
                 logger.debug("LOOKING THRU "+MEDIA_ROOT+self.file.path)
@@ -165,6 +172,25 @@ class File(models.Model):
                 if self.id > 0:
                     self.delete()
                 return
+            
+            if self.type == "video":
+                if isFileNew:
+                    #get width and height of video
+                    res = commands.getoutput("ffmpeg -i "+settings.MEDIA_ROOT+self.file.path)
+                    dimFind = re.findall(r'( \d+x\d+ )', res)
+                    width = 0
+                    height = 0
+                    if len(dimFind) is not 0:
+                        dim = dimFind[0].split("x")
+                        width = dim[0]
+                        height = dim[1]
+                        self.extra["width"] = width
+                        self.extra["height"] = height
+                    #and now convert it to use for web
+                    from utils import convertVideo
+                    if width != 0 and height != 0:
+                        self.extra["msg"] = convertVideo(self.file.path, width, height)
+            
             self.extra["lastFile"] = self.file.filename
         super(File, self).save(*args, **kwargs)
     
