@@ -263,15 +263,23 @@ def convertVideo(filePath, w, h):
         os.remove(convertPath+fileName+".mp4")
     if os.path.exists(convertPath+fileName+".ogv"):
         os.remove(convertPath+fileName+".ogv")
-    
-    comMP4 = "ffmpeg -i '"+fullPath+"' -b 1500k -vcodec libx264 -vpre slow -g 30 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".mp4'"
+
+    #comMP4 = "ffmpeg -i '"+fullPath+"' -b 1500k -vcodec libx264 -vpre slow -g 30 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".mp4'"
+    #comMP4 = "ffmpeg -i '"+fullPath+"' -vcodec libx264 -b 250k -bt 50k -profile baseline -an -acodec libvo_aacenc -ab 56k -ac 2 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".mp4'"
+    comMP4 = "avconv -y -i '"+fullPath+"' -acodec libvo_aacenc -ac 2 -ab 160k \
+        -bf 0 -refs 1 -coder 0 -vcodec libx264 -flags2 -wpred-dct8x8 -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -b 1600k -f mp4 \
+        -threads 0 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".mp4'"
     comOgg = "ffmpeg -y -i '"+fullPath+"' -b 1500k -vcodec libtheora  -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".ogv'"
-    comWebm = "ffmpeg -i '"+fullPath+"'  -b 1500k -vcodec libvpx -acodec libvorbis -ab 160000 -f webm -g 30 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".webm'"
+    comWebm = "ffmpeg -i '"+fullPath+"'  -acodec libvorbis -ac 2 -ab 96k -ar 44100 \
+        -b 345k -threads 0 -s "+str(w)+"x"+str(h)+" '"+convertPath+fileName+".webm'"
     #res = commands.getoutput(comMP4)
     #return res
     
-    os.system(comMP4+" & ")
-    os.system(comWebm+" & ")
+    logCommandMp4 = " 2> "+settings.MEDIA_ROOT+"encodedVideos/mp4.log &"
+    logCommandWebm = " 2> "+settings.MEDIA_ROOT+"encodedVideos/webm.log &"
+    
+    os.system(comMP4+logCommandMp4)
+    os.system(comWebm+logCommandWebm)
     
 ################################################################################################################################
 ## BACKUP

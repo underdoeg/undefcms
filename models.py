@@ -131,7 +131,7 @@ class File(models.Model):
             if oldMd5 != self.extra["md5"]:
                 isFileNew = True
             
-            isFileNew = True
+            #isFileNew = True
             
             if self.type == "auto": #We don't know the mime type yet. try to guess it
                 if mime == "image/jpeg" or mime == "image/png" or mime == "image/gif":
@@ -186,7 +186,6 @@ class File(models.Model):
                     height = 0
                     self.extra["width"] = 0
                     self.extra["height"] = 0
-                    self.extra["blah"] = "ffmpeg -i '"+settings.MEDIA_ROOT+self.file.path+"'"
                     if len(dimFind) is not 0:
                         dim = dimFind[0].split("x")
                         width = dim[0]
