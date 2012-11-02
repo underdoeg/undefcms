@@ -289,11 +289,11 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from tempfile import mkdtemp
 import db
-import tarfile
+#import tarfile
 from datetime import datetime
 from contextlib import closing
 
-def sendBackup(email="philip@undef.ch"):
+def sendBackup(email="public@underdoeg.com", url="http://127.0.0.1:8000"):
     ok = True
         
     #get db settings    
@@ -318,36 +318,58 @@ def sendBackup(email="philip@undef.ch"):
     if not os.path.exists(backupPath):
         os.makedirs(backupPath)
     
-    archiveFile = backupPath+"backup-"+datetime.now().strftime("%m-%d-%Y")+".tgz"
+    archiveFileRel = "backup-"+datetime.now().strftime("%m-%d-%Y")+".tar.gz"
+    archiveFile = backupPath+archiveFileRel
     
     backup_root = mkdtemp()
+    backup_base_root = backup_root
+    backup_root += "/backup/"
+    os.mkdir(backup_root)
     database_root = os.path.join(backup_root, 'databases')
     os.mkdir(database_root)
     
     for name, database in database_list.iteritems():
         db.backup(database, os.path.join(database_root, name))
     
-    tf = tarfile.open(archiveFile, 'w:gz')
-    tf.add(database_root, arcname="backup/databases")
+    #tf = tarfile.open(archiveFile, 'w:gz')
+    #tf.add(database_root, arcname="backup/databases")
+    
+    #copy folder structure of media
+    os.system("cd '"+mediaRoot+"' && find 'uploads/'  -depth -type d -print | cpio -pd '"+backup_root+"' ")
     
     for post in Post.objects.all():
         for file in post.getFiles():
             if file.file:
                 if file.type != filetypes["video"]:
-                    tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+                    #tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+                    os.system("cp '"+mediaRoot+file.file.path+"' '"+backup_root+file.file.path+"'")
         if post.preview:
-            tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+            os.system("cp '"+mediaRoot+post.preview.path+"' '"+backup_root+post.preview.path+"'")
     
     for post in Page.objects.all():
         for file in post.getFiles():
             if file.file:
                 if file.type != filetypes["video"]:
-                    tf.add(mediaRoot+file.file.path, arcname="backup/media/"+file.file.path)
+                    os.system("cp '"+mediaRoot+file.file.path+"' '"+backup_root+file.file.path+"'")
         if post.preview:
-            tf.add(mediaRoot+post.preview.path, arcname="backup/media/"+post.preview.path)
+            os.system("cp '"+mediaRoot+post.preview.path+"' '"+backup_root+post.preview.path+"'")
     
-    email = EmailMessage('Backup', 'Your backup is in the attachment. Only images that are attached to a post or page are included in the archive. Videos are not backuped.', 'undefcms@undef.ch', [email,])
-    email.attach_file(archiveFile)
+    #remove all empty folder
+    os.system("find '"+backup_root+"' -type d -empty -delete")
+    
+    #now create the archive
+    os.system("cd '"+backup_base_root+"' && tar -cvzf '"+archiveFile+"' backup/")
+    
+    #remove backup dir
+    os.system("rm -rf '"+backup_base_root+"'")
+    
+    if "http://" in settings.MEDIA_URL:
+        url = settings.MEDIA_URL
+    else:
+        url = url + settings.MEDIA_URL
+    
+    email = EmailMessage('Backup', 'You can download your backup here: '+url+'backups/'+archiveFileRel+'. Only images that are attached to a post or page are included in the archive. Videos are not backuped.', 'undefcms@undef.ch', [email,])
+    #email.attach_file(archiveFile)
     if email.send() == False:
         ok = False
     

@@ -63,7 +63,7 @@ def page(request, slug):
     return HttpResponse(t.render(RequestContext(request, c)))
 
 def backup(request, email):
-    if sendBackup(email) == True:
+    if sendBackup(email, request.META['HTTP_HOST']) == True:
         return HttpResponse("backup sent to "+email)
     else:
         return HttpResponse("could not send backup to "+email)
