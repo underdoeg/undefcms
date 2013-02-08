@@ -193,9 +193,9 @@ class File(models.Model):
                         self.extra["width"] = width
                         self.extra["height"] = height
                     #and now convert it to use for web
-                    from utils import convertVideo
-                    if width != 0 and height != 0:
-                        self.extra["msg"] = convertVideo(self.file.path, width, height)
+                    #from utils import convertVideo
+                    #if width != 0 and height != 0:
+                    #    self.extra["msg"] = convertVideo(self.file.path, width, height)
             
             self.extra["lastFile"] = self.file.filename
         super(File, self).save(*args, **kwargs)

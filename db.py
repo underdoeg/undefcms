@@ -19,6 +19,7 @@ def __sqlite_backup(database, outfile):
     copy(database['NAME'], outfile)
 
 def __mysql_backup(database, outfile):
+    '''
     command = ['mysqldump']
     if 'USER' in database:
         command += ["--user=%s" % database['USER']]
@@ -29,9 +30,10 @@ def __mysql_backup(database, outfile):
     if 'PORT' in database:
         command += ["--port=%s" % database['PORT']]
     command += [database['NAME']]
-    
+
     with open(outfile, 'w') as f:
         check_call(command, stdout=f)
+    '''
 
 def __postgresql_backup(database, outfile):
     command = ['pg_dump', '-Ox']
@@ -43,7 +45,7 @@ def __postgresql_backup(database, outfile):
         command += ["--port=%s" % database['PORT']]
     if 'NAME' in database:
         command += [database['NAME']]
-    
+
     if 'PASSWORD' in database:
         # create a pgpass file that always returns the same password, as a secure temp file
         password_fd, password_path = mkstemp()
@@ -53,10 +55,10 @@ def __postgresql_backup(database, outfile):
         os.environ['PGPASSFILE'] = password_path
     else:
         command.append('-w')
-    
+
     with open(outfile, 'w') as f:
         check_call(command, stdout=f)
-        
+
     # clean up
     if password_path:
         os.remove(password_path)
