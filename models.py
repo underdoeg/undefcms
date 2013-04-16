@@ -10,7 +10,6 @@ from django.conf import settings
 import re
 from filebrowser.settings import MEDIA_ROOT
 import os
-import md5
 
 # import the logging library
 import logging
@@ -196,7 +195,7 @@ class File(models.Model):
                     #from utils import convertVideo
                     #if width != 0 and height != 0:
                     #    self.extra["msg"] = convertVideo(self.file.path, width, height)
-            
+
             self.extra["lastFile"] = self.file.filename
         super(File, self).save(*args, **kwargs)
     

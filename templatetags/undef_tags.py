@@ -1,5 +1,5 @@
 from django import template
-from undefcms.utils import getThumbWidth, getThumbHeight, getImageWidth, getImageHeight
+from undefcms.utils import getThumbWidth, getThumbHeight, getImageWidth, getImageHeight, renderStringWithTags, getVimeoHtml
 
 register = template.Library()
 
@@ -41,3 +41,14 @@ def thumbHeight(obj, w):
 def thumbWidth(obj, h):
     return obj.thumbWidth(h)
 #register.tag(thumb_width)
+
+################################################################################################
+
+@register.simple_tag 
+def renderWithTags(string):
+    return renderStringWithTags(string)
+
+
+@register.simple_tag 
+def vimeo(id=0, width=0, height=0):
+    return getVimeoHtml(id, width, height)

@@ -127,6 +127,53 @@ def getPagesByParentSlug(slug):
     return getPages().filter(parent__slug=slug)
 
 ################################################################################################################################
+## RENDER A FIELD WITH TAGS
+def renderStringWithTags(content):
+    from django.template import Template, Context
+    content = "{% load undef_tags %} "+content
+    t = Template(content)
+
+    return t.render(Context({}))
+
+################################################################################################################################
+## VIMEO LINK
+def getVimeoHtml(id, width, height):
+    import json
+    import urllib2
+    try:
+        req = urllib2.Request("http://vimeo.com/api/v2/video/"+str(id)+".json", None, {'user-agent':'syncstream/vimeo'})
+        opener = urllib2.build_opener()
+        f = opener.open(req)
+    except Exception, e:
+        return "VIMEO VIDEO WITH ID "+str(id)+" NOT FOUND"
+    else:
+        vimeo = json.load(f)
+        vimeo = vimeo[0]
+        whTxt = ""
+        whCss = ""
+
+        videoWidth = vimeo["width"]
+        videoHeight = vimeo["height"]
+
+        if height == 0 and width != 0:
+            height = int(videoWidth/float(videoHeight)*width)
+
+        if width == 0 and height != 0:
+            width = int(videoWidth/float(videoHeight)*height)
+
+        if height != 0:
+            whTxt += " height='"+str(height)+"'"
+            whCss += " height:"+str(height)+"px;"
+        if width != 0:
+            whTxt += " width='"+str(width)+"'"
+            whCss += " width:"+str(width)+"px"
+        divId = "vimeo"+str(vimeo["id"])
+        videoTag = "<iframe src='http://player.vimeo.com/video/"+str(vimeo["id"])+"?title=0&amp;byline=0&amp;portrait=0&amp;color=030303&amp;autoplay=1' "+whTxt+" frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"
+        ret = "<script type='text/javascript'>var "+divId+" = \""+videoTag+"\";</script>\
+                <div class='video vimeo' id='"+divId+"' style='"+whCss+"' onclick='$(this).html("+divId+")'><img src='"+vimeo["thumbnail_large"]+"' "+whTxt+" /><div class='play'><div class='text'>play</div></div></div>";
+        return ret
+
+################################################################################################################################
 ## THUMB CREATION
 try:
     from PIL import Image, ImageOps
