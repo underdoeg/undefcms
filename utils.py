@@ -160,7 +160,7 @@ def getVimeoHtml(id, width, height):
 
         if width == 0 and height != 0:
             width = int(videoWidth/float(videoHeight)*height)
-
+    
         if height != 0:
             whTxt += " height='"+str(height)+"'"
             whCss += " height:"+str(height)+"px;"
@@ -168,7 +168,7 @@ def getVimeoHtml(id, width, height):
             whTxt += " width='"+str(width)+"'"
             whCss += " width:"+str(width)+"px"
         divId = "vimeo"+str(vimeo["id"])
-        videoTag = "<iframe src='http://player.vimeo.com/video/"+str(vimeo["id"])+"?title=0&amp;byline=0&amp;portrait=0&amp;color=030303&amp;autoplay=1' "+whTxt+" frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"
+        videoTag = "<iframe class='video vimeo' src='http://player.vimeo.com/video/"+str(vimeo["id"])+"?api=1&amp;title=0&amp;byline=0&amp;portrait=0&amp;color=030303&amp;autoplay=1' "+whTxt+" frameborder='0' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>"
         ret = "<script type='text/javascript'>var "+divId+" = \""+videoTag+"\";</script>\
                 <div class='video vimeo' id='"+divId+"' style='"+whCss+"' onclick='$(this).html("+divId+")'><img src='"+vimeo["thumbnail_large"]+"' "+whTxt+" /><div class='play'><div class='text'>play</div></div></div>";
         return ret
