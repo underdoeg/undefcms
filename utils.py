@@ -155,6 +155,9 @@ def getVimeoHtml(id, width, height):
         videoWidth = vimeo["width"]
         videoHeight = vimeo["height"]
 
+        if height == 0 and width == 0:
+            height = settings.VIMEO_HEIGHT
+
         if height == 0 and width != 0:
             height = int(videoWidth/float(videoHeight)*width)
 
